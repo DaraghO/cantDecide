@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" href="image.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CantDecide</title>
 
 <style>
@@ -247,6 +248,66 @@ button.danger {
     }
 
 }
+
+@media(max-width:700px){
+
+    .app {
+        width:100%;
+        min-width:0;
+        max-width:95%;
+        padding:15px;
+    }
+
+    h1 {
+        font-size:28px;
+    }
+
+    .stats {
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .stat {
+        width:100%;
+        min-width:0;
+    }
+
+}
+<!-- mobile view SCREEN -->
+
+@media(max-width:700px){
+
+    button {
+        width:100%;
+        margin-top:10px;
+    }
+
+}
+
+@media(max-width:700px){
+
+    .podium {
+        flex-direction:column;
+        height:auto;
+        align-items:center;
+    }
+
+    .place {
+        width:90%;
+    }
+
+    .first,
+    .second,
+    .third {
+        height:auto;
+    }
+
+}
+
+.option-header span:first-child {
+    overflow-wrap: break-word;
+    max-width:80%;
+}
 </style>
 
 </head>
@@ -328,7 +389,7 @@ Start
 
 <div class="card" id="historyCard">
 
-    <h2>Session History</h2>
+    <h2>Previous winners</h2>
 
     <div id="history">
         No simulations yet.
@@ -515,14 +576,17 @@ function simulationTick(){
 
     // do 100 random decisions every tick
 
-    for(let i=0;i<1;i++){
+    for(let i=0;i<100;i++){
 
         let index =
             Math.floor(
                 Math.random()*options.length
             );
 
-        scores[index]++;
+        let multiplier =
+    Math.floor(Math.random()*3)+1;
+
+scores[index] += multiplier;
 
         totalDecisions++;
 
