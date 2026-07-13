@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Decision Simulator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #121212;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    width: 1000px;
+    max-width: 95%;
+    background: #1e1e1e;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+h1 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.card {
+    background: #282828;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+textarea {
+    width: 100%;
+    height: 180px;
+    resize: none;
+    background: #111;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+input, select {
+    background: #111;
+    color: white;
+    border: 1px solid #444;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    filter: brightness(1.2);
+}
+
+button.secondary {
+    background: #555;
+}
+
+button.danger {
+    background: #d9534f;
+}
+
+.center {
+    text-align: center;
+}
+
+
+/* Simulation */
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: #333;
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 150px;
+}
+
+
+.option {
+    margin-bottom: 15px;
+}
+
+.option-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.bar-container {
+    height: 25px;
+    background: #111;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+
+/* Results */
+
+.podium {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    gap: 20px;
+    height: 250px;
+}
+
+.place {
+    width: 180px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: #333;
+}
+
+.first {
+    height: 220px;
+}
+
+.second {
+    height: 170px;
+}
+
+.third {
+    height: 130px;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+@media(max-width:700px){
+    .app {
+        padding:15px;
+    }
+
+    .stats {
+        flex-direction:column;
+        gap:10px;
+    }
+}
+
+.fade {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.reveal-text {
+    text-align:center;
+    font-size:32px;
+    margin:50px 0;
+    animation:pulse 1s infinite;
+}
+
+
+@keyframes pulse {
+
+    0% {
+        opacity:0.5;
+    }
+
+    50% {
+        opacity:1;
+    }
+
+    100% {
+        opacity:0.5;
+    }
+
+}
+
+
+.podium .place {
+    animation:dropIn 0.8s ease forwards;
+}
+
+
+@keyframes dropIn {
+
+    from {
+        opacity:0;
+        transform:translateY(-80px);
+    }
+
+    to {
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>Decision Simulator</h1>
+
+
+<!-- CONFIGURATION SCREEN -->
+
+<div id="configScreen">
+
+<div class="card">
+
+<label>
+Options (one per line)
+</label>
+
+<textarea id="optionsInput"
+placeholder="Buy ice cream
+Go shopping
+Watch a movie"></textarea>
+
+</div>
+
+
+<div class="card">
+
+<label>
+Simulation Duration
+</label>
+
+<div style="display:flex; gap:10px;">
+
+<input 
+type="number" 
+id="durationValue"
+value="5"
+min="1"
+style="width:120px;"
+>
+
+
+<select id="durationUnit">
+
+<option value="1000">
+Seconds
+</option>
+
+<option value="60000" selected>
+Minutes
+</option>
+
+<option value="3600000">
+Hours
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div class="center">
+
+<button onclick="startSimulation()">
+Start Simulation
+</button>
+
+</div>
+
+
+</div>
+
+
+
+<!-- SIMULATION SCREEN -->
+
+<div id="simulationScreen" class="hidden">
+
+
+<div class="stats">
+
+<div class="stat">
+<h3>Decisions</h3>
+<span id="decisionCount">0</span>
+</div>
+
+
+<div class="stat">
+<h3>Status</h3>
+<span id="status">
+Running
+</span>
+</div>
+
+
+<div class="stat">
+<h3>Time Remaining</h3>
+<span id="timeRemaining">
+--
+</span>
+</div>
+
+
+</div>
+
+
+<div id="optionsDisplay"></div>
+
+
+<div class="center">
+
+<button class="secondary"
+onclick="pauseSimulation()">
+Pause
+</button>
+
+
+<button class="danger"
+onclick="stopSimulation()">
+Stop
+</button>
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- RESULTS SCREEN -->
+
+
+<div id="resultsScreen" class="hidden">
+
+
+<div class="card center">
+
+<h2>Final Result</h2>
+
+<div id="winner"></div>
+
+</div>
+
+
+<div id="podium"></div>
+
+
+<div class="center">
+
+<button onclick="restart()">
+Restart
+</button>
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script>
+
+let options = [];
+let scores = [];
+
+let running = false;
+let paused = false;
+
+let timer = null;
+let endTime = null;
+
+let totalDecisions = 0;
+
+
+function startSimulation(){
+
+    options = document.getElementById("optionsInput")
+        .value
+        .split("\n")
+        .map(x => x.trim())
+        .filter(x => x.length > 0);
+
+
+    if(options.length < 2){
+        alert("Please enter at least two options.");
+        return;
+    }
+
+
+    scores = options.map(() => 0);
+
+    totalDecisions = 0;
+
+
+    let amount =
+    Number(
+        document.getElementById("durationValue").value
+    );
+
+
+let multiplier =
+    Number(
+        document.getElementById("durationUnit").value
+    );
+
+
+endTime =
+    Date.now() +
+    (amount * multiplier);
+
+
+
+    createOptionDisplay();
+
+
+    document.getElementById("configScreen")
+        .classList.add("hidden");
+
+    document.getElementById("simulationScreen")
+        .classList.remove("hidden");
+
+
+    running = true;
+    paused = false;
+
+
+    timer = setInterval(simulationTick,100);
+
+
+}
+
+
+
+function simulationTick(){
+
+
+    if(!running || paused)
+        return;
+
+
+
+    // do 100 random decisions every tick
+
+    for(let i=0;i<100;i++){
+
+        let index =
+            Math.floor(
+                Math.random()*options.length
+            );
+
+        scores[index]++;
+
+        totalDecisions++;
+
+    }
+
+
+
+    updateDisplay();
+
+
+    updateTime();
+
+
+
+    if(Date.now() >= endTime){
+
+        finishSimulation();
+
+    }
+
+}
+
+
+
+
+function createOptionDisplay(){
+
+    let container =
+        document.getElementById("optionsDisplay");
+
+
+    container.innerHTML="";
+
+
+    options.forEach((option,index)=>{
+
+
+        container.innerHTML += `
+
+        <div class="option">
+
+            <div class="option-header">
+
+                <span>${option}</span>
+
+                <span id="count-${index}">
+                0
+                </span>
+
+            </div>
+
+
+            <div class="bar-container">
+
+                <div 
+                class="bar"
+                id="bar-${index}"
+                style="background:hsl(${index*60},70%,50%)">
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+
+
+function updateDisplay(){
+
+
+    document.getElementById("decisionCount")
+        .innerText =
+        totalDecisions.toLocaleString();
+
+
+
+    let max =
+        Math.max(...scores);
+
+
+
+    scores.forEach((score,index)=>{
+
+
+        document.getElementById(
+            `count-${index}`
+        )
+        .innerText =
+        score.toLocaleString();
+
+
+
+        let percentage =
+            totalDecisions ?
+            (score/totalDecisions)*100
+            :0;
+
+
+
+        document.getElementById(
+            `bar-${index}`
+        )
+        .style.width =
+        percentage+"%";
+
+
+    });
+
+
+}
+
+
+
+
+function updateTime(){
+
+    let difference =
+        endTime - Date.now();
+
+
+    if(difference < 0)
+        difference=0;
+
+
+    let seconds =
+        Math.floor(
+            difference/1000
+        );
+
+
+    let minutes =
+        Math.floor(seconds/60);
+
+
+    seconds %= 60;
+
+
+    document.getElementById(
+        "timeRemaining"
+    )
+    .innerText =
+    `${minutes}:${seconds.toString().padStart(2,"0")}`;
+
+}
+
+
+
+
+
+function pauseSimulation(){
+
+    paused=!paused;
+
+
+    document.querySelector(
+        ".secondary"
+    ).innerText =
+    paused ?
+    "Resume" :
+    "Pause";
+
+
+    document.getElementById("status")
+    .innerText =
+    paused ?
+    "Paused":
+    "Running";
+
+}
+
+
+
+
+function stopSimulation(){
+
+    finishSimulation();
+
+}
+
+
+
+
+function finishSimulation(){
+
+    running=false;
+
+    clearInterval(timer);
+
+
+    document.getElementById(
+        "simulationScreen"
+    )
+    .classList.add("hidden");
+
+
+    document.getElementById(
+        "resultsScreen"
+    )
+    .classList.remove("hidden");
+
+
+    document.getElementById(
+        "winner"
+    ).innerHTML = `
+
+    <div class="reveal-text">
+        🎲 Calculating...
+    </div>
+
+    `;
+
+
+    document.getElementById(
+        "podium"
+    ).innerHTML="";
+
+
+    setTimeout(()=>{
+
+        showResults();
+
+    },500);
+
+
+}
+
+
+
+function showResults(){
+
+    let sorted =
+        options.map((name,index)=>({
+            name:name,
+            score:scores[index]
+        }))
+        .sort((a,b)=>b.score-a.score);
+
+
+    let winner =
+        document.getElementById("winner");
+
+
+    let podium =
+        document.getElementById("podium");
+
+
+    let total =
+        scores.reduce(
+            (a,b)=>a+b,
+            0
+        );
+
+
+    winner.classList.add("fade");
+
+	winner.innerHTML = `
+
+        <h2>🏆 Ultimate Decision</h2>
+
+        <h1>${sorted[0].name}</h1>
+
+        <p>
+        ${sorted[0].score.toLocaleString()}
+        votes
+        (${((sorted[0].score/total)*100).toFixed(2)}%)
+        </p>
+
+    `;
+
+
+
+    if(sorted.length >= 3){
+
+
+        podium.innerHTML = `
+
+        <div class="podium">
+
+
+            <div class="place second">
+
+                🥈<br>
+
+                <strong>
+                ${sorted[1].name}
+                </strong>
+
+                <br>
+
+                ${sorted[1].score.toLocaleString()}
+
+            </div>
+
+
+
+            <div class="place first">
+
+                🥇<br>
+
+                <strong>
+                ${sorted[0].name}
+                </strong>
+
+                <br>
+
+                ${sorted[0].score.toLocaleString()}
+
+            </div>
+
+
+
+            <div class="place third">
+
+                🥉<br>
+
+                <strong>
+                ${sorted[2].name}
+                </strong>
+
+                <br>
+
+                ${sorted[2].score.toLocaleString()}
+
+            </div>
+
+
+        </div>
+
+        `;
+
+    }
+    else{
+
+        podium.innerHTML="";
+
+    }
+
+
+
+    // Add full leaderboard underneath
+
+    podium.innerHTML += `
+
+    <div class="card">
+
+    <h2>Final Statistics</h2>
+
+    ${sorted.map((item,index)=>{
+
+
+        let percent =
+            ((item.score/total)*100)
+            .toFixed(2);
+
+
+        return `
+
+        <div class="option">
+
+            <div class="option-header">
+
+                <span>
+                ${index+1}. ${item.name}
+                </span>
+
+                <span>
+                ${item.score.toLocaleString()}
+                (${percent}%)
+                </span>
+
+            </div>
+
+
+            <div class="bar-container">
+
+                <div 
+                class="bar"
+                style="
+                width:${percent}%;
+                background:hsl(${index*60},70%,50%)
+                ">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        `;
+
+
+    }).join("")}
+
+
+    </div>
+
+    `;
+
+
+}
+
+
+function restart(){
+
+    document.getElementById("resultsScreen")
+    .classList.add("hidden");
+
+
+    document.getElementById("configScreen")
+    .classList.remove("hidden");
+
+}
+
+</script>
+
+
+</body>
+</html>
