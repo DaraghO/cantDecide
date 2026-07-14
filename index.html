@@ -245,6 +245,12 @@ button.danger {
     transition: width 0.25s ease;
 }
 
+/* When the countdown is active, hide the leaderboard tells */
+.finale .rank-badge,
+.finale .bar-container {
+    visibility: hidden;
+}
+
 
 /* Results */
 
@@ -325,6 +331,169 @@ button.danger {
 }
 
 
+/* Countdown toggle checkbox */
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.toggle-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #4caf50;
+    padding: 0;
+}
+
+.toggle-row label {
+    margin: 0;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+
+/* ---------- Countdown crash-zoom ---------- */
+
+#countdownOverlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 9998;
+}
+
+.countdown-num {
+    position: absolute;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-size: 40vw;
+    font-weight: 900;
+    color: #ffffff;
+    -webkit-text-stroke: 6px #000;
+    text-shadow: 0 0 30px rgba(0,0,0,0.5);
+    line-height: 0.9;
+    animation: crashZoom 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes crashZoom {
+    0% {
+        transform: scale(10);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    60% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+
+/* ---------- Curtains ---------- */
+
+#curtains {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+}
+
+#curtains.active {
+    display: block;
+}
+
+.curtain {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 52%;
+    background:
+        repeating-linear-gradient(90deg,
+            #4a0a0a 0px,
+            #6b1414 20px,
+            #4a0a0a 40px,
+            #350606 60px);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.7);
+    transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.curtain.left {
+    left: 0;
+    transform: translateX(-100%);
+    border-right: 4px solid #2a0505;
+}
+
+.curtain.right {
+    right: 0;
+    transform: translateX(100%);
+    border-left: 4px solid #2a0505;
+}
+
+#curtains.closed .curtain.left {
+    transform: translateX(0);
+}
+
+#curtains.closed .curtain.right {
+    transform: translateX(0);
+}
+
+
+/* ---------- Confetti / spunk ---------- */
+
+#particleLayer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 10000;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 14px;
+    top: -20px;
+    will-change: transform, opacity;
+}
+
+.spunk-drop {
+    position: absolute;
+    width: 12px;
+    height: 18px;
+    background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #f4f4ee 60%, #dcdcc8 100%);
+    border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+    box-shadow: 0 0 6px rgba(255,255,255,0.6), inset -2px -3px 4px rgba(0,0,0,0.1);
+    will-change: transform, opacity;
+}
+
+.spunk-stain {
+    position: fixed;
+    width: 100px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 9997;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 1px 2px rgba(180,180,150,0.35));
+}
+
+.spunk-stain svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    display: block;
+}
+
+
 /* Mobile */
 
 @media(max-width:700px){
@@ -340,10 +509,21 @@ button.danger {
     button { width: 100%; margin-top: 10px; }
     .podium { flex-direction: column; align-items: center; }
     .place { width: 90%; padding-bottom: 14px; }
+
+    .countdown-num {
+        font-size: 60vw;
+        -webkit-text-stroke: 4px #000;
+    }
 }
 
 .tile-count {
     display: none;
+}
+
+@media(max-width:700px){
+    .podium {
+        display: none;
+    }
 }
 </style>
 
@@ -385,6 +565,10 @@ Make expensive options less likely"></textarea>
                 <option value="3600000">Hours</option>
             </select>
         </div>
+        <div class="toggle-row">
+            <input type="checkbox" id="showCountdown" checked>
+            <label for="showCountdown">Show countdown numbers in the final 10 seconds</label>
+        </div>
     </div>
 
     <div class="center">
@@ -407,7 +591,7 @@ Make expensive options less likely"></textarea>
             <h3>Current leader</h3>
                     <span id="currentLeader">-</span>
         </div>
-       
+
         <div class="stat">
             <h3>Time Remaining</h3>
             <span id="timeRemaining">--</span>
@@ -435,7 +619,7 @@ Make expensive options less likely"></textarea>
     <div id="podium"></div>
 
     <div class="center">
-	    <button onclick="repeatSimulation()">Repeat</button>
+        <button onclick="repeatSimulation()">Repeat</button>
 
         <button onclick="restart()">Main Menu</button>
     </div>
@@ -444,6 +628,12 @@ Make expensive options less likely"></textarea>
 
 
 </div>
+
+
+<!-- Overlays (outside .app so they cover the whole screen) -->
+<div id="countdownOverlay"></div>
+<div id="curtains"><div class="curtain left"></div><div class="curtain right"></div></div>
+<div id="particleLayer"></div>
 
 
 <script>
@@ -466,6 +656,14 @@ const RUBBER_CHANCE = 0.01;  // per-tick chance the bottom option gets a surpris
 const RUBBER_MIN = 0.2;      // burst size as a fraction of the current leader (min)
 const RUBBER_MAX = 0.6;      // burst size as a fraction of the current leader (max)
 
+const COUNTDOWN_START = 10;    // seconds remaining when the finale kicks in
+const SPUNKY_WORDS = [
+    "spunk","cum","jizz","seed","nut","load","goo","glaze","splooge","milk",
+    "cream","sauce","juice","yogurt","frosting","custard","mayo","mayonnaise",
+    "gravy","pudding","banana","sausage","hotdog","hot dog","dick","cock","ass","bum","anal",
+    "willy","balls","boobs","tits","horny","spurt","squirt","drizzle","dribble","sex","fuck","whore","bitch","asian","porn"
+];
+
 let running = false;
 let paused = false;
 let timer = null;
@@ -474,6 +672,10 @@ let endTime = null;
 let totalDecisions = 0;
 
 let faces = [];
+
+let lastDisplayedSecond = -1; // tracks countdown so we only trigger once per second
+let finaleActive = false;
+let showCountdownNums = true; // toggled from config screen at start
 
 
 /* ---------- seed word lists ---------- */
@@ -587,9 +789,9 @@ function pickFavourite(){
     // Pure random rotation. The persistent pecking order in baseWeights is what
     // guarantees a clear winner over any run length; this rotating favourite just
     // shuffles the standings mid run so the lead changes hands and it stays lively.
-	
-	let minTime = 5;
-	let maxTime = 10;
+
+    let minTime = 5;
+    let maxTime = 10;
     favouriteIndex = Math.floor(Math.random() * options.length);
     favouriteChangeTime = Date.now() + minTime + Math.random() * maxTime; // 3 to 6s
 }
@@ -670,7 +872,23 @@ function startSimulation(){
 
     let amount = Number(document.getElementById("durationValue").value);
     let multiplier = Number(document.getElementById("durationUnit").value);
-    endTime = Date.now() + (amount * multiplier);
+    let totalMs = amount * multiplier;
+    endTime = Date.now() + totalMs;
+
+    // pick up the countdown toggle
+    showCountdownNums = document.getElementById("showCountdown").checked;
+
+    // reset finale/countdown state for this run
+    lastDisplayedSecond = -1;
+    // If the whole run is shorter than the finale window, skip the finale entirely
+    // so a 5-second run doesn't spend the whole time censored.
+    finaleActive = false;
+    finaleDisabledForThisRun = totalMs <= COUNTDOWN_START * 1000;
+
+    document.getElementById("simulationScreen").classList.remove("finale");
+    document.getElementById("countdownOverlay").innerHTML = "";
+    document.getElementById("particleLayer").innerHTML = "";
+    document.getElementById("curtains").classList.remove("active", "closed");
 
     createOptionDisplay();
 
@@ -686,6 +904,8 @@ function startSimulation(){
     timer = setInterval(simulationTick, 100);
     rafId = requestAnimationFrame(animateFaces);
 }
+
+let finaleDisabledForThisRun = false;
 
 
 /* ---------- decision tick ---------- */
@@ -714,7 +934,7 @@ function simulationTick(){
         totalDecisions++;
     }
 
-	rubberBand(); 
+    rubberBand();
     updateDisplay();
     updateTime();
 
@@ -878,7 +1098,9 @@ function updateDisplay(){
     let order = options.map((_, i) => i).sort((a,b) => scores[b] - scores[a]);
     let n = options.length;
 
-    document.getElementById("currentLeader").innerText = total === 0 ? "-" : options[order[0]];
+    // During the finale we censor the leader so the reveal stays a surprise
+    let leaderName = total === 0 ? "-" : options[order[0]];
+    document.getElementById("currentLeader").innerText = finaleActive ? "???" : leaderName;
 
     order.forEach((optIndex, rankPos) => {
         let f = faces[optIndex];
@@ -899,11 +1121,59 @@ function updateDisplay(){
 function updateTime(){
     let difference = endTime - Date.now();
     if(difference < 0) difference = 0;
-    let seconds = Math.floor(difference / 1000);
-    let minutes = Math.floor(seconds / 60);
-    seconds %= 60;
+    let totalSeconds = Math.floor(difference / 1000);
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
     document.getElementById("timeRemaining").innerText =
         minutes + ":" + seconds.toString().padStart(2, "0");
+
+    // Enter the finale when we drop into the last COUNTDOWN_START seconds,
+    // unless the total run is too short for a finale to make sense.
+    if(!finaleActive && !finaleDisabledForThisRun && totalSeconds <= COUNTDOWN_START && totalSeconds > 0){
+        finaleActive = true;
+        document.getElementById("simulationScreen").classList.add("finale");
+    }
+
+    // Fire one crash-zoom number each second while in the finale, but only if
+    // the user opted in to the countdown numbers.
+    if(finaleActive && showCountdownNums && totalSeconds !== lastDisplayedSecond && totalSeconds > 0 && totalSeconds <= COUNTDOWN_START){
+        lastDisplayedSecond = totalSeconds;
+        showCountdownNumber(totalSeconds);
+    }
+}
+
+
+/* ---------- countdown crash-zoom ---------- */
+
+function showCountdownNumber(n){
+    let overlay = document.getElementById("countdownOverlay");
+    let el = document.createElement("div");
+    el.className = "countdown-num";
+    el.textContent = n;
+    overlay.appendChild(el);
+    // remove after the animation finishes so overlay doesn't accumulate
+    setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); }, 1100);
+}
+
+
+/* ---------- curtains ---------- */
+
+function closeCurtains(cb){
+    let c = document.getElementById("curtains");
+    c.classList.add("active");
+    // next frame so the transition applies from the offscreen start position
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            c.classList.add("closed");
+            setTimeout(cb, 1250); // matches the 1.2s CSS transition
+        });
+    });
+}
+
+function openCurtains(){
+    let c = document.getElementById("curtains");
+    c.classList.remove("closed");
+    setTimeout(() => c.classList.remove("active"), 1300);
 }
 
 
@@ -928,14 +1198,27 @@ function finishSimulation(){
     clearInterval(timer);
     if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
 
-    document.getElementById("simulationScreen").classList.add("hidden");
-    document.getElementById("resultsScreen").classList.remove("hidden");
-
-    document.getElementById("winner").innerHTML =
-        `<div class="reveal-text">Calculating...</div>`;
-    document.getElementById("podium").innerHTML = "";
-
-    setTimeout(showResults, 500);
+    // If the finale is active, do the curtain close/open reveal. Otherwise
+    // (someone hit Stop early, or a very short run), skip straight to results.
+    if(finaleActive){
+        closeCurtains(() => {
+            document.getElementById("simulationScreen").classList.add("hidden");
+            document.getElementById("simulationScreen").classList.remove("finale");
+            document.getElementById("resultsScreen").classList.remove("hidden");
+            document.getElementById("winner").innerHTML = "";
+            document.getElementById("podium").innerHTML = "";
+            showResults();
+            // small pause so the winner is drawn under the curtains before they open
+            setTimeout(openCurtains, 400);
+        });
+    } else {
+        document.getElementById("simulationScreen").classList.add("hidden");
+        document.getElementById("resultsScreen").classList.remove("hidden");
+        document.getElementById("winner").innerHTML =
+            `<div class="reveal-text">Calculating...</div>`;
+        document.getElementById("podium").innerHTML = "";
+        setTimeout(showResults, 500);
+    }
 }
 
 // static face for the results screen, built with SVG attributes only
@@ -973,6 +1256,239 @@ function staticFace(h){
         <path d="M25 51 q-3.2 6 0 9.5 q3.2 -3.5 0 -9.5 z" fill="#7fd6ff" opacity="${tearO}"></path>
     </svg>`;
 }
+
+
+/* ---------- confetti / spunk particles ---------- */
+
+function isSpunkyWord(name){
+    let lo = name.toLowerCase();
+    return SPUNKY_WORDS.some(w => wordRegex(w).test(lo));
+}
+
+function launchConfetti(){
+    let layer = document.getElementById("particleLayer");
+    let colours = ["#ff5252","#ffb142","#fff176","#69f0ae","#40c4ff","#e040fb","#ff4081"];
+    let count = 90;
+    for(let i = 0; i < count; i++){
+        let el = document.createElement("div");
+        el.className = "confetti";
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.background = colours[Math.floor(Math.random() * colours.length)];
+        el.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+        el.style.opacity = "0";
+        layer.appendChild(el);
+
+        let duration = 2500 + Math.random() * 2500;
+        let drift = (Math.random() - 0.5) * 200;
+        let spin = (Math.random() - 0.5) * 720;
+        let delay = Math.random() * 800;
+
+        el.animate([
+            { transform: "translate(0, -20px) rotate(0deg)", opacity: 1 },
+            { transform: "translate(" + drift + "px, 105vh) rotate(" + spin + "deg)", opacity: 0.9 }
+        ], {
+            duration: duration,
+            delay: delay,
+            easing: "cubic-bezier(0.2, 0.6, 0.4, 1)",
+            fill: "forwards"
+        });
+
+        setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); }, duration + delay + 200);
+    }
+}
+
+
+/* ---- spunk: bursts from the edges rather than a uniform rain ---- */
+
+// Pick an origin somewhere off screen on the left, right, or bottom edge.
+// Returns { x, y } in viewport pixels.
+function pickOffscreenOrigin(){
+    let vw = window.innerWidth, vh = window.innerHeight;
+    let side = Math.floor(Math.random() * 3); // 0 left, 1 right, 2 bottom
+    if(side === 0){
+        // left edge, biased toward the lower half
+        return { x: -40, y: vh * (0.35 + Math.random() * 0.55) };
+    } else if(side === 1){
+        return { x: vw + 40, y: vh * (0.35 + Math.random() * 0.55) };
+    } else {
+        return { x: vw * (0.15 + Math.random() * 0.7), y: vh + 40 };
+    }
+}
+
+function fireVolley(origin, count, onLandingPoint){
+    let layer = document.getElementById("particleLayer");
+    let vw = window.innerWidth, vh = window.innerHeight;
+
+    // Landing target: somewhere in the upper-middle band of the screen, with
+    // a bit of spread so the whole volley isn't stacked on top of itself.
+    let targetX = vw * (0.25 + Math.random() * 0.5);
+    let targetY = vh * (0.15 + Math.random() * 0.35);
+
+    for(let i = 0; i < count; i++){
+        // spread each droplet around the target so it looks like a shot pattern
+        let tx = targetX + (Math.random() - 0.5) * 220;
+        let ty = targetY + (Math.random() - 0.5) * 140;
+
+        // control point for a curved arc: partway between origin and target,
+        // lifted upward so it looks like a projectile trajectory
+        let midX = (origin.x + tx) / 2 + (Math.random() - 0.5) * 80;
+        let midY = Math.min(origin.y, ty) - 60 - Math.random() * 120;
+
+        let el = document.createElement("div");
+        el.className = "spunk-drop";
+        let s = 0.5 + Math.random() * 1.2;
+        el.style.left = origin.x + "px";
+        el.style.top = origin.y + "px";
+        el.style.transform = "scale(" + s + ")";
+        layer.appendChild(el);
+
+        // stagger droplets within the volley over ~450ms so they arrive in a spray
+        let delay = i * (15 + Math.random() * 35);
+        let duration = 550 + Math.random() * 350;
+
+        el.animate([
+            { transform: "translate(0px, 0px) scale(" + s + ")", opacity: 1, offset: 0 },
+            { transform: "translate(" + (midX - origin.x) + "px, " + (midY - origin.y) + "px) scale(" + (s * 1.05) + ")", opacity: 1, offset: 0.55 },
+            { transform: "translate(" + (tx - origin.x) + "px, " + (ty - origin.y) + "px) scale(" + (s * 0.9) + ")", opacity: 0.9, offset: 1 }
+        ], {
+            duration: duration,
+            delay: delay,
+            easing: "cubic-bezier(0.3, 0.6, 0.6, 1)",
+            fill: "forwards"
+        });
+
+        setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); }, duration + delay + 100);
+
+        // The last droplet in the last volley reports its landing point so the
+        // stain can appear right where the shot ended.
+        if(onLandingPoint && i === count - 1){
+            setTimeout(() => onLandingPoint(tx, ty), duration + delay);
+        }
+    }
+}
+
+// SVG for a proper cum-on-screen stain: irregular main blob, satellite splatters,
+// and a drip that we can grow underneath as it slides down.
+function stainSvg(){
+    return `
+    <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <radialGradient id="stainGrad" cx="45%" cy="35%" r="60%">
+                <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.98"/>
+                <stop offset="55%" stop-color="#f4f4ea" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#d8d8bd" stop-opacity="0.55"/>
+            </radialGradient>
+            <radialGradient id="satGrad" cx="50%" cy="40%" r="60%">
+                <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.95"/>
+                <stop offset="100%" stop-color="#e6e6cf" stop-opacity="0.4"/>
+            </radialGradient>
+        </defs>
+
+        <!-- messy satellite splatters at irregular positions and sizes -->
+        <ellipse cx="10" cy="18" rx="2.5" ry="1.6" fill="url(#satGrad)" transform="rotate(20 10 18)"/>
+        <circle cx="88" cy="14" r="2.2" fill="url(#satGrad)"/>
+        <ellipse cx="92" cy="36" rx="3.5" ry="2.2" fill="url(#satGrad)" transform="rotate(-25 92 36)"/>
+        <circle cx="4" cy="42" r="1.4" fill="url(#satGrad)"/>
+        <ellipse cx="78" cy="8" rx="1.8" ry="1.1" fill="url(#satGrad)" transform="rotate(40 78 8)"/>
+        <circle cx="20" cy="8" r="1.2" fill="url(#satGrad)"/>
+        <ellipse cx="64" cy="60" rx="2.4" ry="1.5" fill="url(#satGrad)" transform="rotate(15 64 60)"/>
+        <circle cx="30" cy="62" r="1.6" fill="url(#satGrad)"/>
+
+        <!-- irregular main splat: asymmetric with lumpy edges and small extensions.
+             This is one continuous path so the fill reads as a single mass. -->
+        <path d="
+            M 34 14
+            C 44 8, 58 9, 66 14
+            C 74 12, 82 18, 80 26
+            C 88 28, 90 36, 84 42
+            C 88 48, 82 54, 74 52
+            C 70 58, 60 58, 54 54
+            C 46 58, 36 56, 32 50
+            C 22 52, 14 46, 18 38
+            C 12 34, 14 24, 22 22
+            C 22 16, 28 12, 34 14 Z"
+            fill="url(#stainGrad)"/>
+
+        <!-- small blob extending down to blend with the drip so nothing looks disconnected -->
+        <ellipse cx="52" cy="54" rx="8" ry="5" fill="url(#stainGrad)"/>
+
+        <!-- glossy highlight to sell the wetness -->
+        <path d="M 34 20 C 42 16, 54 16, 62 20 C 58 24, 44 24, 34 22 Z"
+              fill="#ffffff" opacity="0.6"/>
+        <circle cx="42" cy="22" r="2" fill="#ffffff" opacity="0.7"/>
+
+        <!-- drip forming below the blob, seamlessly attached; the class lets us grow it -->
+        <path class="stain-drip"
+              d="M 46 52 Q 44 62 46 66 Q 50 70 54 66 Q 56 62 54 52 Z"
+              fill="url(#stainGrad)"/>
+    </svg>`;
+}
+
+function launchSpunk(){
+    // Multiple staggered volleys from different edges. Each volley lands over
+    // roughly a second, and the next volley starts before the previous is done,
+    // so the whole thing feels overlapping and messy rather than uniform.
+    let volleyCount = 3 + Math.floor(Math.random() * 2); // 3 or 4 volleys
+    let finalLanding = null;
+
+    for(let v = 0; v < volleyCount; v++){
+        let origin = pickOffscreenOrigin();
+        let dropsInVolley = 10 + Math.floor(Math.random() * 8);
+        let startDelay = v * (350 + Math.random() * 200);
+
+        setTimeout(() => {
+            fireVolley(origin, dropsInVolley, (tx, ty) => {
+                // remember where the last volley landed
+                finalLanding = { x: tx, y: ty };
+            });
+        }, startDelay);
+    }
+
+    // After the last volley lands, plant the stain at that spot.
+    let stainDelay = volleyCount * 500 + 700;
+
+    setTimeout(() => {
+        let vw = window.innerWidth, vh = window.innerHeight;
+        // fall back to a reasonable spot if for some reason we didn't record one
+        let pos = finalLanding || { x: vw * (0.3 + Math.random() * 0.4), y: vh * 0.3 };
+
+        let stain = document.createElement("div");
+        stain.className = "spunk-stain";
+        stain.innerHTML = stainSvg();
+        // centre the 100x80 svg on the landing point
+        stain.style.left = (pos.x - 50) + "px";
+        stain.style.top = (pos.y - 30) + "px";
+        stain.style.opacity = "0";
+        document.body.appendChild(stain);
+
+        // splat in: scale up then settle
+        stain.animate([
+            { transform: "scale(0.2)", opacity: 0 },
+            { transform: "scale(1.2)", opacity: 1, offset: 0.4 },
+            { transform: "scale(1)", opacity: 1 }
+        ], { duration: 350, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "forwards" });
+
+        // let it sit, then start slowly sliding down + fading
+        let drip = stain.querySelector(".stain-drip");
+        setTimeout(() => {
+            // extend the drip while the whole stain slides down and fades
+            if(drip){
+                drip.animate([
+                    { d: "path('M 50 52 Q 48 60 50 66 Q 52 60 50 52 Z')" },
+                    { d: "path('M 50 52 Q 47 72 50 90 Q 53 72 50 52 Z')" }
+                ], { duration: 8000, fill: "forwards" });
+            }
+            stain.animate([
+                { transform: "translateY(0)", opacity: 1 },
+                { transform: "translateY(12vh)", opacity: 0.75, offset: 0.6 },
+                { transform: "translateY(45vh)", opacity: 0 }
+            ], { duration: 12000, easing: "cubic-bezier(0.55, 0, 0.85, 0.4)", fill: "forwards" });
+
+            setTimeout(() => { if(stain.parentNode) stain.parentNode.removeChild(stain); }, 12500);
+        }, 1100);
+    }, stainDelay);
+}
+
 
 function showResults(){
 const WINNER_MESSAGES = [
@@ -1060,6 +1576,12 @@ let msg = WINNER_MESSAGES[Math.floor(Math.random() * WINNER_MESSAGES.length)].re
         let h = sorted.length === 1 ? 0.5 : 1 - index / (sorted.length - 1);
         bar.style.background = faceColour(h);
     });
+
+    // fire the celebration a moment after the winner is on screen
+    setTimeout(() => {
+        if(isSpunkyWord(sorted[0].name)) launchSpunk();
+        else launchConfetti();
+    }, finaleActive ? 1400 : 700);
 }
 
 
@@ -1068,10 +1590,13 @@ let msg = WINNER_MESSAGES[Math.floor(Math.random() * WINNER_MESSAGES.length)].re
 function restart(){
     document.getElementById("resultsScreen").classList.add("hidden");
     document.getElementById("configScreen").classList.remove("hidden");
+    // clean up any lingering stains from a previous run
+    document.querySelectorAll(".spunk-stain").forEach(el => el.remove());
 }
 
 function repeatSimulation(){
     document.getElementById("resultsScreen").classList.add("hidden");
+    document.querySelectorAll(".spunk-stain").forEach(el => el.remove());
     startSimulation();
 }
 
