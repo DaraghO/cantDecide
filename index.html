@@ -341,6 +341,10 @@ button.danger {
     .podium { flex-direction: column; align-items: center; }
     .place { width: 90%; padding-bottom: 14px; }
 }
+
+.tile-count {
+    display: none;
+}
 </style>
 
 </head>
@@ -349,9 +353,8 @@ button.danger {
 
 <div class="app">
 
-<h1>I cant Decide so do it for me</h1>
+<h1>Daragh Decides...!</h1>
 <div class="center">
-<p>Enter 2 or more options and set the amount of time you want for the decision to be made.</p>
 </div>
 
 
@@ -401,13 +404,10 @@ Make expensive options less likely"></textarea>
 
     <div class="stats">
         <div class="stat">
-            <h3>Decisions</h3>
-            <span id="decisionCount">0</span>
+            <h3>Current leader</h3>
+                    <span id="currentLeader">-</span>
         </div>
-        <div class="stat">
-            <h3>Status</h3>
-            <span id="status">Running</span>
-        </div>
+       
         <div class="stat">
             <h3>Time Remaining</h3>
             <span id="timeRemaining">--</span>
@@ -435,7 +435,9 @@ Make expensive options less likely"></textarea>
     <div id="podium"></div>
 
     <div class="center">
-        <button onclick="restart()">Restart</button>
+	    <button onclick="repeatSimulation()">Repeat</button>
+
+        <button onclick="restart()">Main Menu</button>
     </div>
 
 </div>
@@ -460,6 +462,9 @@ const FAV_MULT = 3;      // temporary boost given to the current hidden favourit
 
 const BOOST_WEIGHT = 4; // seed "more likely" -> way more likely
 const REDUCE_WEIGHT = 0.02; // seed "less likely" -> way less likely
+const RUBBER_CHANCE = 0.01;  // per-tick chance the bottom option gets a surprise surge
+const RUBBER_MIN = 0.2;      // burst size as a fraction of the current leader (min)
+const RUBBER_MAX = 0.6;      // burst size as a fraction of the current leader (max)
 
 let running = false;
 let paused = false;
@@ -609,6 +614,28 @@ function weightedRandom(){
 }
 
 
+function rubberBand(){
+    if(Math.random() >= RUBBER_CHANCE) return;
+
+    let leader = Math.max.apply(null, scores);
+    if(leader <= 0) return;
+
+    // lowest scorer that was NOT deliberately suppressed by the seed prompt,
+    // so a "make X less likely" option still stays dead last
+    let underdog = -1;
+    for(let i = 0; i < options.length; i++){
+        if(biasWeights[i] < 1) continue;
+        if(underdog === -1 || scores[i] < scores[underdog]) underdog = i;
+    }
+    if(underdog === -1) return;
+
+    // only throw a lifeline when they are genuinely behind
+    if(scores[underdog] > leader * 0.7) return;
+
+    let burst = Math.floor(leader * (RUBBER_MIN + Math.random() * (RUBBER_MAX - RUBBER_MIN))) + 50;
+    scores[underdog] += burst;
+}
+
 /* ---------- start ---------- */
 
 function startSimulation(){
@@ -651,7 +678,7 @@ function startSimulation(){
     document.getElementById("simulationScreen").classList.remove("hidden");
 
     document.querySelector(".secondary").innerText = "Pause";
-    document.getElementById("status").innerText = "Running";
+    //document.getElementById("status").innerText = "Running";
 
     running = true;
     paused = false;
@@ -687,6 +714,7 @@ function simulationTick(){
         totalDecisions++;
     }
 
+	rubberBand(); 
     updateDisplay();
     updateTime();
 
@@ -844,13 +872,13 @@ function animateFaces(now){
 
 function updateDisplay(){
 
-    document.getElementById("decisionCount").innerText = totalDecisions.toLocaleString();
-
     let total = scores.reduce((a,b) => a + b, 0);
 
     // rank order for face emotion and badges
     let order = options.map((_, i) => i).sort((a,b) => scores[b] - scores[a]);
     let n = options.length;
+
+    document.getElementById("currentLeader").innerText = total === 0 ? "-" : options[order[0]];
 
     order.forEach((optIndex, rankPos) => {
         let f = faces[optIndex];
@@ -866,6 +894,7 @@ function updateDisplay(){
         f.bar.style.background = "hsl(" + (index * 47 % 360) + ",70%,55%)";
     });
 }
+
 
 function updateTime(){
     let difference = endTime - Date.now();
@@ -883,7 +912,7 @@ function updateTime(){
 function pauseSimulation(){
     paused = !paused;
     document.querySelector(".secondary").innerText = paused ? "Resume" : "Pause";
-    document.getElementById("status").innerText = paused ? "Paused" : "Running";
+   // document.getElementById("status").innerText = paused ? "Paused" : "Running";
 }
 
 function stopSimulation(){
@@ -946,7 +975,18 @@ function staticFace(h){
 }
 
 function showResults(){
-
+const WINNER_MESSAGES = [
+    "wow! {pct}% favour!",
+    "absolutely smashed it!!!!",
+    "hmm daragh decided that one!",
+    "jeee....",
+    "wowowow wWOAHHHHHOHHAHAHHAHAH",
+    "noice!",
+    "caaaaaaameeeee oonnnnnnnnn",
+    "!!!!!!",
+    "Daragh",
+    "and that's the end of that chapter",
+];
     let sorted = options
         .map((name, index) => ({ name: name, score: scores[index] }))
         .sort((a,b) => b.score - a.score);
@@ -959,14 +999,16 @@ function showResults(){
         percentage: ((sorted[0].score / total) * 100).toFixed(2)
     });
     updateHistory();
+let pct = ((sorted[0].score / total) * 100).toFixed(2);
+let msg = WINNER_MESSAGES[Math.floor(Math.random() * WINNER_MESSAGES.length)].replace("{pct}", pct + "%");
 
     let winner = document.getElementById("winner");
     winner.classList.add("fade");
     winner.innerHTML = `
         ${staticFace(1)}
-        <h2>Ultimate Decision</h2>
+        <h2>And the winner is...</h2>
         <h1>${sorted[0].name}</h1>
-        <p>${sorted[0].score.toLocaleString()} votes (${((sorted[0].score / total) * 100).toFixed(2)}%)</p>
+        <p>${msg}</p>
     `;
 
     let podium = document.getElementById("podium");
@@ -1026,6 +1068,11 @@ function showResults(){
 function restart(){
     document.getElementById("resultsScreen").classList.add("hidden");
     document.getElementById("configScreen").classList.remove("hidden");
+}
+
+function repeatSimulation(){
+    document.getElementById("resultsScreen").classList.add("hidden");
+    startSimulation();
 }
 
 function updateHistory(){
