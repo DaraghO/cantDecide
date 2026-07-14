@@ -98,6 +98,15 @@ button.danger {
     text-align: center;
 }
 
+.duration-row {
+    display: flex;
+    gap: 10px;
+}
+
+.duration-value {
+    width: 120px;
+}
+
 
 /* Simulation */
 
@@ -106,7 +115,7 @@ button.danger {
     justify-content: space-around;
     text-align: center;
     margin-bottom: 20px;
-	width:100%;
+    width: 100%;
 }
 
 .stat {
@@ -117,27 +126,123 @@ button.danger {
 }
 
 
-.option {
-    margin-bottom: 15px;
+/* Face tiles */
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
 }
 
-.option-header {
-    display: flex;
-    justify-content: space-between;
+.tile {
+    position: relative;
+    background: #282828;
+    border-radius: 14px;
+    padding: 16px 12px 14px;
+    text-align: center;
+}
+
+.rank-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #111;
+    color: #ddd;
+    font-size: 13px;
+    font-weight: bold;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    border-radius: 50%;
+}
+
+.face {
+    width: 96px;
+    height: 96px;
+    display: block;
+    margin: 0 auto 10px;
+    overflow: visible;
+    will-change: transform;
+}
+
+.face-bg {
+    stroke: rgba(0,0,0,0.25);
+    stroke-width: 2;
+}
+
+.brow {
+    fill: #2b2b3a;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.eye {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.eye ellipse {
+    fill: #2b2b3a;
+}
+
+.mouth {
+    fill: none;
+    stroke: #2b2b3a;
+    stroke-linecap: round;
+    transform-box: view-box;
+    transform-origin: 50px 62px;
+}
+
+.cheek {
+    fill: #ff7a90;
+    opacity: 0;
+}
+
+.tear {
+    fill: #7fd6ff;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: drip 2.2s ease-in-out infinite;
+}
+
+.grin {
+    opacity: 0;
+    transform-box: view-box;
+    transform-origin: 50px 58px;
+}
+
+@keyframes drip {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+}
+
+.tile-name {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 4px;
+    overflow-wrap: break-word;
+}
+
+.tile-count {
+    font-size: 13px;
+    color: #bbb;
+    margin-bottom: 8px;
 }
 
 .bar-container {
-    height: 25px;
+    height: 10px;
     background: #111;
     border-radius: 20px;
     overflow: hidden;
-    margin-top: 5px;
 }
 
 .bar {
     height: 100%;
     width: 0%;
-    transition: width 0.3s;
+    border-radius: 20px;
+    transition: width 0.25s ease;
 }
 
 
@@ -148,44 +253,29 @@ button.danger {
     justify-content: center;
     align-items: end;
     gap: 20px;
-    height: 250px;
+    margin: 20px 0 10px;
 }
 
 .place {
-    width: 180px;
+    width: 190px;
     text-align: center;
-    padding: 20px;
+    padding: 18px 14px;
     border-radius: 12px;
     background: #333;
 }
 
-.first {
-    height: 220px;
+.place .face {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 8px;
 }
 
-.second {
-    height: 170px;
-}
-
-.third {
-    height: 130px;
-}
-
+.first { padding-bottom: 40px; }
+.second { padding-bottom: 20px; }
+.third { padding-bottom: 6px; }
 
 .hidden {
     display: none;
-}
-
-
-@media(max-width:700px){
-    .app {
-        padding:15px;
-    }
-
-    .stats {
-        flex-direction:column;
-        gap:10px;
-    }
 }
 
 .fade {
@@ -193,120 +283,63 @@ button.danger {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 
 .reveal-text {
-    text-align:center;
-    font-size:32px;
-    margin:50px 0;
-    animation:pulse 1s infinite;
+    text-align: center;
+    font-size: 32px;
+    margin: 50px 0;
+    animation: pulse 1s infinite;
 }
-
 
 @keyframes pulse {
-
-    0% {
-        opacity:0.5;
-    }
-
-    50% {
-        opacity:1;
-    }
-
-    100% {
-        opacity:0.5;
-    }
-
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
 }
-
 
 .podium .place {
-    animation:dropIn 0.8s ease forwards;
+    animation: dropIn 0.8s ease forwards;
 }
-
 
 @keyframes dropIn {
-
-    from {
-        opacity:0;
-        transform:translateY(-80px);
-    }
-
-    to {
-        opacity:1;
-        transform:translateY(0);
-    }
-
+    from { opacity: 0; transform: translateY(-80px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-@media(max-width:700px){
-
-    .app {
-        width:100%;
-        min-width:0;
-        max-width:95%;
-        padding:15px;
-    }
-
-    h1 {
-        font-size:28px;
-    }
-
-    .stats {
-        flex-direction:column;
-        gap:10px;
-    }
-
-    .stat {
-        width:100%;
-        min-width:0;
-    }
-
-}
-<!-- mobile view SCREEN -->
-
-@media(max-width:700px){
-
-    button {
-        width:100%;
-        margin-top:10px;
-    }
-
-}
-
-@media(max-width:700px){
-
-    .podium {
-        flex-direction:column;
-        height:auto;
-        align-items:center;
-    }
-
-    .place {
-        width:90%;
-    }
-
-    .first,
-    .second,
-    .third {
-        height:auto;
-    }
-
+.option-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
 }
 
 .option-header span:first-child {
     overflow-wrap: break-word;
-    max-width:80%;
+    max-width: 80%;
+}
+
+.result-row {
+    margin-bottom: 15px;
+}
+
+
+/* Mobile */
+
+@media(max-width:700px){
+    .app {
+        width: 100%;
+        min-width: 0;
+        max-width: 95%;
+        padding: 15px;
+    }
+    h1 { font-size: 28px; }
+    .stats { flex-direction: column; gap: 10px; }
+    .stat { width: 100%; min-width: 0; }
+    button { width: 100%; margin-top: 10px; }
+    .podium { flex-direction: column; align-items: center; }
+    .place { width: 90%; padding-bottom: 14px; }
 }
 </style>
 
@@ -318,731 +351,697 @@ button.danger {
 
 <h1>I cant Decide so do it for me</h1>
 <div class="center">
-<p>
-Enter 2 or more options and set the amount of time you want for the decision to be made.
-</p>
+<p>Enter 2 or more options and set the amount of time you want for the decision to be made.</p>
 </div>
+
 
 <!-- CONFIGURATION SCREEN -->
-
 <div id="configScreen">
 
-<div class="card">
-
-<label>
-Options (one per line)
-</label>
-
-<textarea id="optionsInput"
-placeholder="Buy ice cream
+    <div class="card">
+        <label>Options (one per line)</label>
+        <textarea id="optionsInput" placeholder="Buy ice cream
 Go shopping
 Watch a movie"></textarea>
+    </div>
 
-</div>
+    <div class="card">
+        <label>Seeding Prompt (optional)</label>
+        <textarea id="seedPrompt" placeholder="Example:
+Make anything with food more likely
+Make expensive options less likely"></textarea>
+    </div>
 
+    <div class="card">
+        <label>Duration</label>
+        <div class="duration-row">
+            <input type="number" id="durationValue" value="5" min="1" class="duration-value">
+            <select id="durationUnit">
+                <option value="1000">Seconds</option>
+                <option value="60000" selected>Minutes</option>
+                <option value="3600000">Hours</option>
+            </select>
+        </div>
+    </div>
 
-<div class="card">
+    <div class="center">
+        <button onclick="startSimulation()">Start</button>
+    </div>
 
-<label>
- Duration
-</label>
-
-<div style="display:flex; gap:10px;">
-
-<input 
-type="number" 
-id="durationValue"
-value="5"
-min="1"
-style="width:120px;"
->
-
-
-<select id="durationUnit">
-
-<option value="1000">
-Seconds
-</option>
-
-<option value="60000" selected>
-Minutes
-</option>
-
-<option value="3600000">
-Hours
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-
-<div class="center">
-
-<button onclick="startSimulation()">
-Start
-</button>
-
-</div>
-
-<div class="card" id="historyCard">
-
-    <h2>Previous winners</h2>
-
-    <div id="history">
-        No simulations yet.
+    <div class="card" id="historyCard">
+        <h2>Previous winners</h2>
+        <div id="history">No simulations yet.</div>
     </div>
 
 </div>
-</div>
-
-
 
 
 <!-- SIMULATION SCREEN -->
-
 <div id="simulationScreen" class="hidden">
 
+    <div class="stats">
+        <div class="stat">
+            <h3>Decisions</h3>
+            <span id="decisionCount">0</span>
+        </div>
+        <div class="stat">
+            <h3>Status</h3>
+            <span id="status">Running</span>
+        </div>
+        <div class="stat">
+            <h3>Time Remaining</h3>
+            <span id="timeRemaining">--</span>
+        </div>
+    </div>
 
-<div class="stats">
+    <div id="optionsDisplay" class="tiles"></div>
 
-<div class="stat">
-<h3>Decisions</h3>
-<span id="decisionCount">0</span>
-</div>
-
-
-<div class="stat">
-<h3>Status</h3>
-<span id="status">
-Running
-</span>
-</div>
-
-
-<div class="stat">
-<h3>Time Remaining</h3>
-<span id="timeRemaining">
---
-</span>
-</div>
-
+    <div class="center">
+        <button class="secondary" onclick="pauseSimulation()">Pause</button>
+        <button class="danger" onclick="stopSimulation()">Stop</button>
+    </div>
 
 </div>
-
-
-<div id="optionsDisplay"></div>
-
-
-<div class="center">
-
-<button class="secondary"
-onclick="pauseSimulation()">
-Pause
-</button>
-
-
-<button class="danger"
-onclick="stopSimulation()">
-Stop
-</button>
-
-</div>
-
-
-</div>
-
-
 
 
 <!-- RESULTS SCREEN -->
-
-
 <div id="resultsScreen" class="hidden">
 
+    <div class="card center">
+        <h2>Final Result</h2>
+        <div id="winner"></div>
+    </div>
 
-<div class="card center">
+    <div id="podium"></div>
 
-<h2>Final Result</h2>
-
-<div id="winner"></div>
-
-</div>
-
-
-<div id="podium"></div>
-
-
-<div class="center">
-
-<button onclick="restart()">
-Restart
-</button>
+    <div class="center">
+        <button onclick="restart()">Restart</button>
+    </div>
 
 </div>
 
 
 </div>
-
-
-
-</div>
-
 
 
 <script>
+/* ---------- state ---------- */
+
 let sessionHistory = [];
 
 let options = [];
 let scores = [];
+let biasWeights = [];   // persistent, set once from the seed prompt
+let baseWeights = [];   // persistent hidden pecking order, guarantees separation
+
+let favouriteIndex = -1;
+let favouriteChangeTime = 0;
+const FAV_MULT = 3;      // temporary boost given to the current hidden favourite
+
+const BOOST_WEIGHT = 4; // seed "more likely" -> way more likely
+const REDUCE_WEIGHT = 0.02; // seed "less likely" -> way less likely
 
 let running = false;
 let paused = false;
-
 let timer = null;
+let rafId = null;
 let endTime = null;
-
 let totalDecisions = 0;
 
+let faces = [];
+
+
+/* ---------- seed word lists ---------- */
+
+const boostWords = [
+    "boost","boosted","increase","increased","raise","raised","higher",
+    "prefer","preferred","favour","favor","favourite","favorite",
+    "choose","pick","want","like","likes","love","loves",
+    "more likely","more probable","more chance","higher chance","greater chance",
+    "increase odds","improve odds","better odds","make likely","make more likely",
+    "bias towards","bias toward","lean towards","lean toward",
+    "push towards","push toward","weight towards","weight toward",
+    "give priority to","prioritise","prioritize",
+    "heavily favour","strongly favour","greatly increase","significantly increase",
+    "massively increase","strong bias","major boost"
+];
+
+const reduceWords = [
+    "reduce","reduced","lower","lowered","decrease","decreased",
+    "drop","dropped","weaken","weakened","limit","limited",
+    "avoid","avoiding","against","dislike","dislikes","hate","hates",
+    "remove","exclude","ignore",
+    "less likely","less probable","less chance","lower chance",
+    "decrease odds","worse odds","make unlikely","make less likely",
+    "bias against","biased against","lean away from","push away from",
+    "weight against","give lower priority",
+    "heavily reduce","strongly reduce","greatly reduce","significantly reduce",
+    "massively reduce","strong negative bias"
+];
+
+const ignoreWords = [
+    "make","anything","something","everything","with","the","a","an","to","of",
+    "for","please","that","this","it","be","is","are","has","have","had",
+    "should","would","could","can","will","may","might","really","just",
+    "option","options","one","ones","more","less","them","those","these",
+    "any","all","and","or","but","on","in","at","by","stuff","things","thing"
+];
+
+
+/* ---------- small helpers ---------- */
+
+function lerp(a, b, t){ return a + (b - a) * t; }
+function clamp(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
+
+function shuffle(a){
+    for(let i = a.length - 1; i > 0; i--){
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function wordRegex(phrase){
+    let esc = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("\\b" + esc + "\\b", "gi");
+}
+
+function countSignals(text, words){
+    let n = 0;
+    words.forEach(w => {
+        let m = text.match(wordRegex(w));
+        if(m) n += m.length;
+    });
+    return n;
+}
+
+
+/* ---------- seed parsing (fixed) ---------- */
+
+function processSeedPrompt(){
+
+    let prompt = document.getElementById("seedPrompt").value.toLowerCase().trim();
+    if(prompt === "") return;
+
+    // Direction: count real word/phrase hits with word boundaries so
+    // "less likely" no longer trips the boost word "like".
+    let boostN = countSignals(prompt, boostWords);
+    let reduceN = countSignals(prompt, reduceWords);
+    if(boostN === 0 && reduceN === 0) return;
+
+    let boost = boostN >= reduceN; // ties fall to boost
+
+    // Strip every direction word and filler word, leaving the target words.
+    let target = prompt;
+    boostWords.forEach(w => target = target.replace(wordRegex(w), " "));
+    reduceWords.forEach(w => target = target.replace(wordRegex(w), " "));
+    ignoreWords.forEach(w => target = target.replace(wordRegex(w), " "));
+
+    let tokens = target
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .split(" ")
+        .filter(t => t.length >= 3);
+
+    if(tokens.length === 0) return; // nothing left to aim at
+
+    options.forEach((option, index) => {
+        let lo = option.toLowerCase();
+        let hit = tokens.some(t => lo.includes(t));
+        if(hit){
+            biasWeights[index] = boost ? BOOST_WEIGHT : REDUCE_WEIGHT;
+        }
+    });
+}
+
+
+/* ---------- hidden favourite ---------- */
+
+function pickFavourite(){
+    // Pure random rotation. The persistent pecking order in baseWeights is what
+    // guarantees a clear winner over any run length; this rotating favourite just
+    // shuffles the standings mid run so the lead changes hands and it stays lively.
+	
+	let minTime = 5;
+	let maxTime = 10;
+    favouriteIndex = Math.floor(Math.random() * options.length);
+    favouriteChangeTime = Date.now() + minTime + Math.random() * maxTime; // 3 to 6s
+}
+
+function effWeight(i){
+    let w = biasWeights[i] * baseWeights[i];
+    if(i === favouriteIndex) w *= FAV_MULT;
+    return w;
+}
+
+function weightedRandom(){
+    let total = 0;
+    for(let i = 0; i < options.length; i++) total += effWeight(i);
+    if(total <= 0) return Math.floor(Math.random() * options.length);
+
+    let r = Math.random() * total;
+    for(let i = 0; i < options.length; i++){
+        r -= effWeight(i);
+        if(r <= 0) return i;
+    }
+    return options.length - 1;
+}
+
+
+/* ---------- start ---------- */
 
 function startSimulation(){
 
-    options = document.getElementById("optionsInput")
-        .value
-        .split("\n")
-        .map(x => x.trim())
-        .filter(x => x.length > 0);
-
+    options = document.getElementById("optionsInput").value
+        .split("\n").map(x => x.trim()).filter(x => x.length > 0);
 
     if(options.length < 2){
         alert("Please enter at least two options.");
         return;
     }
 
-
     scores = options.map(() => 0);
+    biasWeights = options.map(() => 1);
+
+    // Hidden pecking order: a geometric spread, shuffled, so some options are
+    // quietly favoured over others. This is what keeps final scores apart at any
+    // duration instead of drifting into a tie.
+    baseWeights = options.map((_, i) => Math.pow(0.8, i));
+    shuffle(baseWeights);
 
     totalDecisions = 0;
+    favouriteIndex = -1;
 
+    processSeedPrompt();
 
-    let amount =
-    Number(
-        document.getElementById("durationValue").value
-    );
+    // A seed bias must always win or lose clearly, so it overrides the hidden
+    // order: any explicitly biased option drops back to a neutral base of 1.
+    biasWeights.forEach((w, i) => { if(w !== 1) baseWeights[i] = 1; });
 
+    pickFavourite();
 
-let multiplier =
-    Number(
-        document.getElementById("durationUnit").value
-    );
-
-
-endTime =
-    Date.now() +
-    (amount * multiplier);
-
-
+    let amount = Number(document.getElementById("durationValue").value);
+    let multiplier = Number(document.getElementById("durationUnit").value);
+    endTime = Date.now() + (amount * multiplier);
 
     createOptionDisplay();
 
+    document.getElementById("configScreen").classList.add("hidden");
+    document.getElementById("simulationScreen").classList.remove("hidden");
 
-    document.getElementById("configScreen")
-        .classList.add("hidden");
-
-    document.getElementById("simulationScreen")
-        .classList.remove("hidden");
-
+    document.querySelector(".secondary").innerText = "Pause";
+    document.getElementById("status").innerText = "Running";
 
     running = true;
     paused = false;
 
-
-    timer = setInterval(simulationTick,100);
-
-
+    timer = setInterval(simulationTick, 100);
+    rafId = requestAnimationFrame(animateFaces);
 }
 
 
+/* ---------- decision tick ---------- */
 
 function simulationTick(){
 
+    if(!running || paused) return;
 
-    if(!running || paused)
-        return;
+    if(Date.now() >= favouriteChangeTime) pickFavourite();
 
+    let decisionsThisTick = Math.floor(Math.random() * 70) + 30; // 30-99
 
+    for(let i = 0; i < decisionsThisTick; i++){
 
-    // do 100 random decisions every tick
+        let index = weightedRandom();
 
-    for(let i=0;i<100;i++){
+        let roll = Math.random();
+        let points;
+        if(roll < 0.60) points = 1;
+        else if(roll < 0.85) points = Math.floor(Math.random() * 10) + 2;
+        else if(roll < 0.95) points = Math.floor(Math.random() * 100) + 20;
+        else if(roll < 0.99) points = Math.floor(Math.random() * 1000) + 200;
+        else points = Math.floor(Math.random() * 5000) + 1000;
 
-        let index =
-            Math.floor(
-                Math.random()*options.length
-            );
-
-        let multiplier =
-    Math.floor(Math.random()*3)+1;
-
-scores[index] += multiplier;
-
+        scores[index] += points;
         totalDecisions++;
-
     }
-
-
 
     updateDisplay();
-
-
     updateTime();
 
-
-
-    if(Date.now() >= endTime){
-
-        finishSimulation();
-
-    }
-
+    if(Date.now() >= endTime) finishSimulation();
 }
 
 
+/* ---------- face markup + rendering ---------- */
 
+const FACE_MARKUP = `
+<svg class="face" viewBox="0 0 100 100" aria-hidden="true">
+    <circle class="face-bg" cx="50" cy="50" r="40"></circle>
+    <circle class="cheek cheek-l" cx="29" cy="61" r="7"></circle>
+    <circle class="cheek cheek-r" cx="71" cy="61" r="7"></circle>
+    <g class="brow brow-l"><rect x="24" y="35" width="20" height="4.5" rx="2.25"></rect></g>
+    <g class="brow brow-r"><rect x="56" y="35" width="20" height="4.5" rx="2.25"></rect></g>
+    <g class="eye eye-l"><ellipse cx="35" cy="47" rx="5.5" ry="7"></ellipse></g>
+    <g class="eye eye-r"><ellipse cx="65" cy="47" rx="5.5" ry="7"></ellipse></g>
+    <path class="mouth" d="M35 62 Q50 74 65 62" stroke-width="5"></path>
+    <g class="grin">
+        <path d="M31 59 Q50 64 69 59 Q69 82 50 82 Q31 82 31 59 Z" fill="#7a2e34"></path>
+        <path d="M32.5 59 Q50 63.5 67.5 59 Q66 66 50 67 Q34 66 32.5 59 Z" fill="#ffffff"></path>
+        <path d="M43 74 Q50 71 57 74 Q57 81 50 81 Q43 81 43 74 Z" fill="#ff8a9a"></path>
+    </g>
+    <path class="tear" d="M25 51 q-3.2 6 0 9.5 q3.2 -3.5 0 -9.5 z"></path>
+</svg>`;
+
+// colour stops from brooding (0) to joyful (1)
+const FACE_STOPS = [
+    [0.00, [95, 113, 150]],   // brooding slate blue
+    [0.25, [125, 128, 160]],  // moody muted
+    [0.50, [217, 197, 138]],  // neutral tan
+    [0.75, [255, 206, 92]],   // slightly happy gold
+    [1.00, [255, 210, 30]]    // joyful bright
+];
+
+function faceColour(h){
+    for(let i = 0; i < FACE_STOPS.length - 1; i++){
+        let [p0, c0] = FACE_STOPS[i];
+        let [p1, c1] = FACE_STOPS[i + 1];
+        if(h <= p1){
+            let t = (h - p0) / (p1 - p0);
+            let r = Math.round(lerp(c0[0], c1[0], t));
+            let g = Math.round(lerp(c0[1], c1[1], t));
+            let b = Math.round(lerp(c0[2], c1[2], t));
+            return "rgb(" + r + "," + g + "," + b + ")";
+        }
+    }
+    let last = FACE_STOPS[FACE_STOPS.length - 1][1];
+    return "rgb(" + last[0] + "," + last[1] + "," + last[2] + ")";
+}
 
 function createOptionDisplay(){
 
-    let container =
-        document.getElementById("optionsDisplay");
+    let container = document.getElementById("optionsDisplay");
+    container.innerHTML = "";
+    faces = [];
 
-
-    container.innerHTML="";
-
-
-    options.forEach((option,index)=>{
-
-
-        container.innerHTML += `
-
-        <div class="option">
-
-            <div class="option-header">
-
-                <span>${option}</span>
-
-                <span id="count-${index}">
-                0
-                </span>
-
-            </div>
-
-
-            <div class="bar-container">
-
-                <div 
-                class="bar"
-                id="bar-${index}"
-                style="background:hsl(${index*60},70%,50%)">
-                </div>
-
-            </div>
-
-        </div>
-
+    options.forEach((option, index) => {
+        let tile = document.createElement("div");
+        tile.className = "tile";
+        tile.innerHTML = `
+            <div class="rank-badge">-</div>
+            ${FACE_MARKUP}
+            <div class="tile-name"></div>
+            <div class="tile-count">0</div>
+            <div class="bar-container"><div class="bar"></div></div>
         `;
+        tile.querySelector(".tile-name").textContent = option;
+        container.appendChild(tile);
 
+        faces.push({
+            el: tile.querySelector(".face"),
+            bg: tile.querySelector(".face-bg"),
+            browL: tile.querySelector(".brow-l"),
+            browR: tile.querySelector(".brow-r"),
+            eyeL: tile.querySelector(".eye-l"),
+            eyeR: tile.querySelector(".eye-r"),
+            mouth: tile.querySelector(".mouth"),
+            cheekL: tile.querySelector(".cheek-l"),
+            cheekR: tile.querySelector(".cheek-r"),
+            tear: tile.querySelector(".tear"),
+            grin: tile.querySelector(".grin"),
+            badge: tile.querySelector(".rank-badge"),
+            count: tile.querySelector(".tile-count"),
+            bar: tile.querySelector(".bar"),
+            curH: 0.5,
+            targetH: 0.5,
+            phase: Math.random() * Math.PI * 2,
+            nextBlink: performance.now() + 1500 + Math.random() * 2500,
+            blinkUntil: 0
+        });
+    });
+}
+
+function animateFaces(now){
+
+    faces.forEach((f, i) => {
+
+        f.curH += (f.targetH - f.curH) * 0.08;
+        let h = f.curH;
+
+        f.bg.setAttribute("fill", faceColour(h));
+
+        // eyebrows: furrowed and low when sad, raised when neutral, then they
+        // fade away entirely toward the happy end (the open :D face has none).
+        let browDy = lerp(5, -5, h);
+        let browVis = clamp((0.75 - h) / 0.2, 0, 1);
+        f.browL.style.opacity = browVis;
+        f.browR.style.opacity = browVis;
+        f.browL.style.transform = "translateY(" + browDy + "px) rotate(" + lerp(20, -8, h) + "deg)";
+        f.browR.style.transform = "translateY(" + browDy + "px) rotate(" + lerp(-20, 8, h) + "deg)";
+
+        // eyes: squinted when sad, wide when happy, plus a blink
+        if(now > f.nextBlink){
+            f.blinkUntil = now + 120;
+            f.nextBlink = now + 2200 + Math.random() * 2800;
+        }
+        let blink = now < f.blinkUntil ? 0.1 : 1;
+        let eyeScale = lerp(0.55, 1.05, h) * blink;
+        f.eyeL.style.transform = "scaleY(" + eyeScale + ")";
+        f.eyeR.style.transform = "scaleY(" + eyeScale + ")";
+
+        // mouth: single arc, scaleY(-1) frown -> 0 flat -> 1 smile, then it
+        // cross-fades into the open-mouth grin as it gets very happy.
+        let sy = (2 * h - 1);
+        let sx = lerp(0.9, 1.12, h);
+        f.mouth.style.transform = "scaleX(" + sx + ") scaleY(" + sy + ")";
+        f.mouth.setAttribute("stroke-width", lerp(4, 6.5, h).toFixed(2));
+
+        let grinAmt = clamp((h - 0.7) / 0.15, 0, 1);
+        f.mouth.style.opacity = 1 - grinAmt;
+        f.grin.style.opacity = grinAmt;
+        f.grin.style.transform = "scale(" + lerp(0.9, 1.12, h) + ")";
+
+        // extras
+        let cheek = clamp((h - 0.6) / 0.4, 0, 1) * 0.55;
+        f.cheekL.style.opacity = cheek;
+        f.cheekR.style.opacity = cheek;
+
+        f.tear.style.opacity = clamp((0.22 - h) / 0.22, 0, 1);
+
+        // idle motion: gentle bob, bouncier when happy, small sway when sad
+        let amp = 1 + h * 2.2;
+        let bob = Math.sin(now * (0.0015 + h * 0.0016) + f.phase) * amp;
+        let sway = (1 - h) * Math.sin(now * 0.0012 + f.phase) * 2;
+        f.el.style.transform = "translateY(" + bob + "px) rotate(" + sway + "deg)";
     });
 
+    rafId = requestAnimationFrame(animateFaces);
 }
 
 
-
+/* ---------- display updates ---------- */
 
 function updateDisplay(){
 
+    document.getElementById("decisionCount").innerText = totalDecisions.toLocaleString();
 
-    document.getElementById("decisionCount")
-        .innerText =
-        totalDecisions.toLocaleString();
+    let total = scores.reduce((a,b) => a + b, 0);
 
+    // rank order for face emotion and badges
+    let order = options.map((_, i) => i).sort((a,b) => scores[b] - scores[a]);
+    let n = options.length;
 
-
-    let max =
-        Math.max(...scores);
-
-
-
-    scores.forEach((score,index)=>{
-
-
-        document.getElementById(
-            `count-${index}`
-        )
-        .innerText =
-        score.toLocaleString();
-
-
-
-        let percentage =
-            totalDecisions ?
-            (score/totalDecisions)*100
-            :0;
-
-
-
-        document.getElementById(
-            `bar-${index}`
-        )
-        .style.width =
-        percentage+"%";
-
-
+    order.forEach((optIndex, rankPos) => {
+        let f = faces[optIndex];
+        f.targetH = total === 0 ? 0.5 : (n === 1 ? 0.5 : 1 - rankPos / (n - 1));
+        f.badge.innerText = rankPos + 1;
     });
 
-
+    scores.forEach((score, index) => {
+        let f = faces[index];
+        f.count.innerText = score.toLocaleString();
+        let percentage = total > 0 ? (score / total) * 100 : 0;
+        f.bar.style.width = percentage + "%";
+        f.bar.style.background = "hsl(" + (index * 47 % 360) + ",70%,55%)";
+    });
 }
-
-
-
 
 function updateTime(){
-
-    let difference =
-        endTime - Date.now();
-
-
-    if(difference < 0)
-        difference=0;
-
-
-    let seconds =
-        Math.floor(
-            difference/1000
-        );
-
-
-    let minutes =
-        Math.floor(seconds/60);
-
-
+    let difference = endTime - Date.now();
+    if(difference < 0) difference = 0;
+    let seconds = Math.floor(difference / 1000);
+    let minutes = Math.floor(seconds / 60);
     seconds %= 60;
-
-
-    document.getElementById(
-        "timeRemaining"
-    )
-    .innerText =
-    `${minutes}:${seconds.toString().padStart(2,"0")}`;
-
+    document.getElementById("timeRemaining").innerText =
+        minutes + ":" + seconds.toString().padStart(2, "0");
 }
 
 
-
-
+/* ---------- controls ---------- */
 
 function pauseSimulation(){
-
-    paused=!paused;
-
-
-    document.querySelector(
-        ".secondary"
-    ).innerText =
-    paused ?
-    "Resume" :
-    "Pause";
-
-
-    document.getElementById("status")
-    .innerText =
-    paused ?
-    "Paused":
-    "Running";
-
+    paused = !paused;
+    document.querySelector(".secondary").innerText = paused ? "Resume" : "Pause";
+    document.getElementById("status").innerText = paused ? "Paused" : "Running";
 }
-
-
-
 
 function stopSimulation(){
-
     finishSimulation();
-
 }
 
 
-
+/* ---------- finish + results ---------- */
 
 function finishSimulation(){
 
-    running=false;
-
+    running = false;
     clearInterval(timer);
+    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
 
+    document.getElementById("simulationScreen").classList.add("hidden");
+    document.getElementById("resultsScreen").classList.remove("hidden");
 
-    document.getElementById(
-        "simulationScreen"
-    )
-    .classList.add("hidden");
+    document.getElementById("winner").innerHTML =
+        `<div class="reveal-text">Calculating...</div>`;
+    document.getElementById("podium").innerHTML = "";
 
-
-    document.getElementById(
-        "resultsScreen"
-    )
-    .classList.remove("hidden");
-
-
-    document.getElementById(
-        "winner"
-    ).innerHTML = `
-
-    <div class="reveal-text">
-        🎲 Calculating...
-    </div>
-
-    `;
-
-
-    document.getElementById(
-        "podium"
-    ).innerHTML="";
-
-
-    setTimeout(()=>{
-
-        showResults();
-
-    },500);
-
-
+    setTimeout(showResults, 500);
 }
 
+// static face for the results screen, built with SVG attributes only
+function staticFace(h){
+    let col = faceColour(h);
+    let browDy = lerp(5, -5, h);
+    let rotL = lerp(20, -8, h);
+    let rotR = lerp(-20, 8, h);
+    let browVis = clamp((0.75 - h) / 0.2, 0, 1);
+    let eyeS = lerp(0.55, 1.05, h);
+    let sy = (2 * h - 1);
+    let sx = lerp(0.9, 1.12, h);
+    let sw = lerp(4, 6.5, h).toFixed(2);
+    let grinAmt = clamp((h - 0.7) / 0.15, 0, 1);
+    let gs = lerp(0.9, 1.12, h);
+    let cheek = clamp((h - 0.6) / 0.4, 0, 1) * 0.55;
+    let tearO = clamp((0.22 - h) / 0.22, 0, 1);
 
+    return `
+    <svg class="face" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="40" fill="${col}" stroke="rgba(0,0,0,0.25)" stroke-width="2"></circle>
+        <circle cx="29" cy="61" r="7" fill="#ff7a90" opacity="${cheek}"></circle>
+        <circle cx="71" cy="61" r="7" fill="#ff7a90" opacity="${cheek}"></circle>
+        <g opacity="${browVis}" transform="translate(0 ${browDy}) rotate(${rotL} 34 37.25)"><rect x="24" y="35" width="20" height="4.5" rx="2.25" fill="#2b2b3a"></rect></g>
+        <g opacity="${browVis}" transform="translate(0 ${browDy}) rotate(${rotR} 66 37.25)"><rect x="56" y="35" width="20" height="4.5" rx="2.25" fill="#2b2b3a"></rect></g>
+        <g transform="translate(35 47) scale(1 ${eyeS}) translate(-35 -47)"><ellipse cx="35" cy="47" rx="5.5" ry="7" fill="#2b2b3a"></ellipse></g>
+        <g transform="translate(65 47) scale(1 ${eyeS}) translate(-65 -47)"><ellipse cx="65" cy="47" rx="5.5" ry="7" fill="#2b2b3a"></ellipse></g>
+        <path d="M35 62 Q50 74 65 62" fill="none" stroke="#2b2b3a" stroke-width="${sw}" stroke-linecap="round" opacity="${1 - grinAmt}"
+              transform="translate(50 62) scale(${sx} ${sy}) translate(-50 -62)"></path>
+        <g opacity="${grinAmt}" transform="translate(50 58) scale(${gs}) translate(-50 -58)">
+            <path d="M31 59 Q50 64 69 59 Q69 82 50 82 Q31 82 31 59 Z" fill="#7a2e34"></path>
+            <path d="M32.5 59 Q50 63.5 67.5 59 Q66 66 50 67 Q34 66 32.5 59 Z" fill="#ffffff"></path>
+            <path d="M43 74 Q50 71 57 74 Q57 81 50 81 Q43 81 43 74 Z" fill="#ff8a9a"></path>
+        </g>
+        <path d="M25 51 q-3.2 6 0 9.5 q3.2 -3.5 0 -9.5 z" fill="#7fd6ff" opacity="${tearO}"></path>
+    </svg>`;
+}
 
 function showResults(){
 
-    let sorted =
-        options.map((name,index)=>({
-            name:name,
-            score:scores[index]
-        }))
-        .sort((a,b)=>b.score-a.score);
+    let sorted = options
+        .map((name, index) => ({ name: name, score: scores[index] }))
+        .sort((a,b) => b.score - a.score);
 
+    let total = scores.reduce((a,b) => a + b, 0) || 1;
 
-    let winner =
-        document.getElementById("winner");
+    sessionHistory.unshift({
+        winner: sorted[0].name,
+        votes: sorted[0].score,
+        percentage: ((sorted[0].score / total) * 100).toFixed(2)
+    });
+    updateHistory();
 
-
-    let podium =
-        document.getElementById("podium");
-
-
-    let total =
-        scores.reduce(
-            (a,b)=>a+b,
-            0
-        );
-
-
-	sessionHistory.unshift({
-    winner: sorted[0].name,
-    votes: sorted[0].score,
-    total: total,
-    percentage: ((sorted[0].score / total) * 100).toFixed(2)
-	});
-
-	updateHistory();
-
+    let winner = document.getElementById("winner");
     winner.classList.add("fade");
-
-	winner.innerHTML = `
-
-        <h2>🏆 Ultimate Decision</h2>
-
+    winner.innerHTML = `
+        ${staticFace(1)}
+        <h2>Ultimate Decision</h2>
         <h1>${sorted[0].name}</h1>
-
-        <p>
-        ${sorted[0].score.toLocaleString()}
-        votes
-        (${((sorted[0].score/total)*100).toFixed(2)}%)
-        </p>
-
+        <p>${sorted[0].score.toLocaleString()} votes (${((sorted[0].score / total) * 100).toFixed(2)}%)</p>
     `;
 
-
+    let podium = document.getElementById("podium");
 
     if(sorted.length >= 3){
-
-
         podium.innerHTML = `
-
         <div class="podium">
-
-
             <div class="place second">
-
-                🥈<br>
-
-                <strong>
-                ${sorted[1].name}
-                </strong>
-
-                <br>
-
+                ${staticFace(0.6)}
+                <strong>${sorted[1].name}</strong><br>
                 ${sorted[1].score.toLocaleString()}
-
             </div>
-
-
-
             <div class="place first">
-
-                🥇<br>
-
-                <strong>
-                ${sorted[0].name}
-                </strong>
-
-                <br>
-
+                ${staticFace(1)}
+                <strong>${sorted[0].name}</strong><br>
                 ${sorted[0].score.toLocaleString()}
-
             </div>
-
-
-
             <div class="place third">
-
-                🥉<br>
-
-                <strong>
-                ${sorted[2].name}
-                </strong>
-
-                <br>
-
+                ${staticFace(0.32)}
+                <strong>${sorted[2].name}</strong><br>
                 ${sorted[2].score.toLocaleString()}
-
             </div>
-
-
-        </div>
-
-        `;
-
+        </div>`;
+    } else {
+        podium.innerHTML = "";
     }
-    else{
-
-        podium.innerHTML="";
-
-    }
-
-
-
-    // Add full leaderboard underneath
 
     podium.innerHTML += `
-
     <div class="card">
-
-    <h2>Final Statistics</h2>
-
-    ${sorted.map((item,index)=>{
-
-
-        let percent =
-            ((item.score/total)*100)
-            .toFixed(2);
-
-
-        return `
-
-        <div class="option">
-
-            <div class="option-header">
-
-                <span>
-                ${index+1}. ${item.name}
-                </span>
-
-                <span>
-                ${item.score.toLocaleString()}
-                (${percent}%)
-                </span>
-
-            </div>
-
-
-            <div class="bar-container">
-
-                <div 
-                class="bar"
-                style="
-                width:${percent}%;
-                background:hsl(${index*60},70%,50%)
-                ">
+        <h2>Final Statistics</h2>
+        ${sorted.map((item, index) => {
+            let percent = ((item.score / total) * 100).toFixed(2);
+            let h = sorted.length === 1 ? 0.5 : 1 - index / (sorted.length - 1);
+            return `
+            <div class="result-row">
+                <div class="option-header">
+                    <span>${index + 1}. ${item.name}</span>
+                    <span>${item.score.toLocaleString()} (${percent}%)</span>
                 </div>
+                <div class="bar-container">
+                    <div class="bar" style="width:${percent}%"></div>
+                </div>
+            </div>`;
+        }).join("")}
+    </div>`;
 
-            </div>
-
-        </div>
-
-
-        `;
-
-
-    }).join("")}
-
-
-    </div>
-
-    `;
-
-
+    // colour the leaderboard bars by rank mood
+    [...podium.querySelectorAll(".card .bar")].forEach((bar, index) => {
+        let h = sorted.length === 1 ? 0.5 : 1 - index / (sorted.length - 1);
+        bar.style.background = faceColour(h);
+    });
 }
 
 
+/* ---------- restart + history ---------- */
+
 function restart(){
-
-    document.getElementById("resultsScreen")
-    .classList.add("hidden");
-
-
-    document.getElementById("configScreen")
-    .classList.remove("hidden");
-	
-	document.getElementById("historyCard").style.display = "block";
-
+    document.getElementById("resultsScreen").classList.add("hidden");
+    document.getElementById("configScreen").classList.remove("hidden");
 }
 
 function updateHistory(){
-
-    const history =
-        document.getElementById("history");
-
+    const history = document.getElementById("history");
     if(sessionHistory.length === 0){
-
-        history.innerHTML =
-            "No simulations yet.";
-
+        history.innerHTML = "No simulations yet.";
         return;
     }
-
-    history.innerHTML =
-    sessionHistory
-    .map((item)=>`
-        <div style="margin-bottom:12px;">
-            <strong>🥇 ${item.winner}</strong><br>
+    history.innerHTML = sessionHistory.map(item => `
+        <div class="result-row">
+            <strong>${item.winner}</strong><br>
             ${item.percentage}% (${item.votes.toLocaleString()} votes)
         </div>
-    `)
-    .join("");
+    `).join("");
 }
-
 </script>
-
 
 </body>
 </html>
